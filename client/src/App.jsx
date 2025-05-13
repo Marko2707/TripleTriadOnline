@@ -1,42 +1,40 @@
-import { useState, useEffect } from 'react'
-import reactLogo from './assets/react.svg'
-import viteLogo from '/vite.svg'
-import './App.css'
+import { useState, useEffect } from 'react';
+import './App.css';
+import Card from './components/Card';
 
 function App() {
-  const [count, setCount] = useState(0)
-  const [backendMessage, setBackendMessage] = useState('')
+  const [backendMessage, setBackendMessage] = useState('');
+  const [cards, setCards] = useState([]);
 
   useEffect(() => {
-    // Backend-Verbindung testen
+    // Test-Endpoint
     fetch('http://localhost:5000/api/test')
-      .then(response => response.json())
+      .then(res => res.json())
       .then(data => setBackendMessage(data.message))
-      .catch(error => console.error('Fehler beim Verbinden mit dem Backend:', error));
+      .catch(console.error);
+
+    // Karten vom Backend holen
+    fetch('http://localhost:5000/api/cards')
+      .then(res => res.json())
+      .then(data => setCards(data))
+      .catch(console.error);
   }, []);
 
   return (
-    <>
-      <div>
-        <a href="https://vite.dev" target="_blank">
-          <img src={viteLogo} className="logo" alt="Vite logo" />
-        </a>
-        <a href="https://react.dev" target="_blank">
-          <img src={reactLogo} className="logo react" alt="React logo" />
-        </a>
-      </div>
+    <div className="App">
       <h1>Triple Triad</h1>
-      <p>Backend-Status: {backendMessage || 'Verbinde...'}</p>
-      <div className="card">
-        <button onClick={() => setCount((count) => count + 1)}>
-          count is {count}
-        </button>
-        <p>
-          Edit <code>src/App.jsx</code> and save to test HMR
-        </p>
+      <p>Backend-Status: {backendMessage || 'Verbinde…'}</p>
+
+      <div className="cards-container">
+        {cards.length === 0
+          ? <p>Keine Karten gefunden.</p>
+          : cards.map(card => (
+              <Card key={card.id} card={card} />
+            ))
+        }
       </div>
-    </>
-  )
+    </div>
+  );
 }
 
-export default App
+export default App;
